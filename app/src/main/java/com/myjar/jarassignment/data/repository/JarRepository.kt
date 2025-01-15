@@ -15,7 +15,7 @@ class JarRepositoryImpl(
     override suspend fun fetchResults(): Flow<List<ComputerItem>> = flow {
         try {
             val results = apiService.fetchResults()
-            if (results.isNullOrEmpty()) {
+            if (results.isEmpty()) {
                 emit(emptyList())
             } else {
                 emit(results)

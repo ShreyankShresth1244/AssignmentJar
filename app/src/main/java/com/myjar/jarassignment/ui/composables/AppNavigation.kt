@@ -9,17 +9,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -52,7 +56,18 @@ fun AppNavigation(
     }
 }
 
-
+@Composable
+fun SearchBar(
+    modifier: Modifier,
+    searchQuery : String,
+    onSearchTextChange: (String)  -> Unit){
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = onSearchTextChange,
+            label = {Text("Search Products")},
+            modifier = modifier
+        )
+}
 
 @Composable
 fun ItemListScreen(
@@ -61,27 +76,37 @@ fun ItemListScreen(
 ) {
     val items = viewModel.listStringData.collectAsState()
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        if (items.value.isEmpty()) {
-            item {
-                Text(
-                    text = "No items available",
-                    modifier = Modifier.padding(16.dp),
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Gray
-                )
-            }
-        } else {
-            items(items.value) { item ->
-                ItemCard(
-                    item = item,
-                    onClick = { navController.navigate("item_detail/${item.id}") }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredItems = items.value.filter { it.name.contains(searchQuery, ignoreCase = true)}
+
+    Column(Modifier.fillMaxSize().padding(16.dp))
+    {
+        SearchBar(
+            modifier = Modifier.fillMaxWidth(),
+            searchQuery = searchQuery,
+            onSearchTextChange = {searchQuery = it})
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (items.value.isEmpty()) {
+                item {
+                    Text(
+                        text = "No items available",
+                        modifier = Modifier.padding(16.dp),
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray
+                    )
+                }
+            } else {
+                items(filteredItems) { item ->
+                    ItemCard(
+                        item = item,
+                        onClick = { navController.navigate("item_detail/${item.id}") }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
     }
