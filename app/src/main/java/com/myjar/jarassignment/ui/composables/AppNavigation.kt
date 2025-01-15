@@ -33,14 +33,15 @@ fun AppNavigation(
     viewModel: JarViewModel,
 ) {
     val navController = rememberNavController()
-    val navigate = remember { mutableStateOf<String>("") }
 
-    NavHost(modifier = modifier, navController = navController, startDestination = "item_list") {
+    NavHost(
+        modifier = modifier,
+        navController = navController,
+        startDestination = "item_list"
+    ) {
         composable("item_list") {
             ItemListScreen(
                 viewModel = viewModel,
-                onNavigateToDetail = { selectedItem -> navigate.value = selectedItem },
-                navigate = navigate,
                 navController = navController
             )
         }
@@ -51,42 +52,41 @@ fun AppNavigation(
     }
 }
 
+
+
 @Composable
 fun ItemListScreen(
     viewModel: JarViewModel,
-    onNavigateToDetail: (String) -> Unit,
-    navigate: MutableState<String>,
     navController: NavHostController
 ) {
     val items = viewModel.listStringData.collectAsState()
-
-    DisposableEffect(Unit) {
-        onDispose {
-            navigate.value = ""
-        }
-    }
-
-    if (navigate.value.isNotBlank()) {
-        val currRoute = navController.currentDestination?.route.orEmpty()
-        if (!currRoute.contains("item_detail")) {
-            navController.navigate("item_detail/${navigate.value}")
-        }
-    }
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        items(items.value) { item ->
-            ItemCard(
-                item = item,
-                onClick = { onNavigateToDetail(item.id) }
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+        if (items.value.isEmpty()) {
+            item {
+                Text(
+                    text = "No items available",
+                    modifier = Modifier.padding(16.dp),
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Gray
+                )
+            }
+        } else {
+            items(items.value) { item ->
+                ItemCard(
+                    item = item,
+                    onClick = { navController.navigate("item_detail/${item.id}") }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }
+
 
 
 @Composable

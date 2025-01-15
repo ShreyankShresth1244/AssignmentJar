@@ -14,10 +14,14 @@ class JarRepositoryImpl(
 ) : JarRepository {
     override suspend fun fetchResults(): Flow<List<ComputerItem>> = flow {
         try {
-            emit(apiService.fetchResults())
+            val results = apiService.fetchResults()
+            println("API Response: $results")
+            emit(results)
         } catch (e: Exception) {
-            emit(emptyList()) // or log the error
+            e.printStackTrace()
+            emit(emptyList())
         }
     }
+
 
 }
