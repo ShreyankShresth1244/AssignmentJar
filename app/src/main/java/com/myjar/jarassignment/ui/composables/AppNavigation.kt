@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -59,12 +60,19 @@ fun ItemListScreen(
 ) {
     val items = viewModel.listStringData.collectAsState()
 
+    DisposableEffect(Unit) {
+        onDispose {
+            navigate.value = ""
+        }
+    }
+
     if (navigate.value.isNotBlank()) {
         val currRoute = navController.currentDestination?.route.orEmpty()
         if (!currRoute.contains("item_detail")) {
             navController.navigate("item_detail/${navigate.value}")
         }
     }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -79,6 +87,7 @@ fun ItemListScreen(
         }
     }
 }
+
 
 @Composable
 fun ItemCard(item: ComputerItem, onClick: () -> Unit) {
