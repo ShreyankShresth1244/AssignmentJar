@@ -12,15 +12,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 
 class JarViewModel : ViewModel() {
 
     private val _listStringData = MutableStateFlow<List<ComputerItem>>(emptyList())
-    val listStringData: StateFlow<List<ComputerItem>>
-        get() = _listStringData
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String>
@@ -31,7 +27,7 @@ class JarViewModel : ViewModel() {
             if (query.isBlank()) items
             else items.filter { it.name.contains(query, ignoreCase = true) }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()) // Convert Flow to StateFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val repository: JarRepository = JarRepositoryImpl(createRetrofit())
 
