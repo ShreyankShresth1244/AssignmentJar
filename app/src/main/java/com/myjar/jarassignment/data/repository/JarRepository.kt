@@ -16,7 +16,7 @@ class JarRepositoryImpl(
         try {
             val results = apiService.fetchResults()
             if (results.isNullOrEmpty()) {
-                emit(emptyList()) // Default empty list
+                emit(emptyList())
             } else {
                 emit(results)
             }
@@ -25,7 +25,4 @@ class JarRepositoryImpl(
             emit(emptyList())
         }
     }
-
-
-
 }
