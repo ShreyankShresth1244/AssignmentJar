@@ -97,7 +97,7 @@ fun ItemDetailScreen(itemId: String?) {
     // Fetch the item details based on the itemId
     // Here, you can fetch it from the ViewModel or repository
     Text(
-        text = "Item Details for ID: $itemId",
+        text = "Item Details for ID: ${itemId ?: "Unknown"}",
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
