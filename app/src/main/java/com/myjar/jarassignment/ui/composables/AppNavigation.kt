@@ -97,9 +97,23 @@ fun ItemCard(item: ComputerItem, onClick: () -> Unit) {
             .padding(8.dp)
             .clickable { onClick() }
     ) {
-        Text(text = item.name, fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(text = "Name: ${item.name}", fontWeight = FontWeight.Bold, color = Color.Black)
+        item.data?.let { data ->
+            data.color?.let { Text(text = "Color: $it") }
+            data.capacity?.let { Text(text = "Capacity: $it") }
+            data.price?.let { Text(text = "Price: $it") }
+            data.capacityGB?.let { Text(text = "Capacity GB: $it") }
+            data.screenSize?.let { Text(text = "Screen Size: $it") }
+            data.description?.let { Text(text = "Description: $it") }
+            data.generation?.let { Text(text = "Generation: $it") }
+            data.strapColour?.let { Text(text = "Strap Colour: $it") }
+            data.caseSize?.let { Text(text = "Case Size: $it") }
+            data.cpuModel?.let { Text(text = "CPU Model: $it") }
+            data.hardDiskSize?.let { Text(text = "Hard Disk Size: $it") }
+        }
     }
 }
+
 
 @Composable
 fun ItemDetailScreen(itemId: String?) {
