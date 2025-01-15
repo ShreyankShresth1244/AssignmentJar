@@ -1,24 +1,13 @@
+// UI (AppNavigation.kt)
 package com.myjar.jarassignment.ui.composables
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -59,14 +48,15 @@ fun AppNavigation(
 @Composable
 fun SearchBar(
     modifier: Modifier,
-    searchQuery : String,
-    onSearchTextChange: (String)  -> Unit){
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = onSearchTextChange,
-            label = {Text("Search Products")},
-            modifier = modifier
-        )
+    searchQuery: String,
+    onSearchTextChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = searchQuery,
+        onValueChange = onSearchTextChange,
+        label = { Text("Search Products") },
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -74,23 +64,20 @@ fun ItemListScreen(
     viewModel: JarViewModel,
     navController: NavHostController
 ) {
-    val items = viewModel.listStringData.collectAsState()
+    val filteredItems by viewModel.filteredItems.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
 
-    var searchQuery by remember { mutableStateOf("") }
-
-    val filteredItems = items.value.filter { it.name.contains(searchQuery, ignoreCase = true)}
-
-    Column(Modifier.fillMaxSize().padding(16.dp))
-    {
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
         SearchBar(
             modifier = Modifier.fillMaxWidth(),
             searchQuery = searchQuery,
-            onSearchTextChange = {searchQuery = it})
+            onSearchTextChange = { viewModel.updateSearchQuery(it) }
+        )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (items.value.isEmpty()) {
+            if (filteredItems.isEmpty()) {
                 item {
                     Text(
                         text = "No items available",
@@ -111,8 +98,6 @@ fun ItemListScreen(
         }
     }
 }
-
-
 
 @Composable
 fun ItemCard(item: ComputerItem, onClick: () -> Unit) {
@@ -139,11 +124,8 @@ fun ItemCard(item: ComputerItem, onClick: () -> Unit) {
     }
 }
 
-
 @Composable
 fun ItemDetailScreen(itemId: String?) {
-    // Fetch the item details based on the itemId
-    // Here, you can fetch it from the ViewModel or repository
     Text(
         text = "Item Details for ID: ${itemId ?: "Unknown"}",
         modifier = Modifier
